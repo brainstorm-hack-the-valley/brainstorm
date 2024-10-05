@@ -1,19 +1,27 @@
+'use client';
 import { redirect } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Clock, FileWarning } from "lucide-react";
 import { Lightning, DangerTriangle } from "@mynaui/icons-react";
+import { useRouter } from "next/navigation";
 
 import Header from "@/components/ui/header"
 import * as Game from "@/game/game"
 import { Button } from "@/components/ui/button";
 
+function handleClick(difficulty: string) {
+  localStorage.setItem("difficulty", difficulty);
+  console.log(localStorage.getItem("difficulty"));
+}
+
 export default function Page({ params }: { params: { mode: string } }) {
-  const { mode } = params
-  const gamemode = mode === "rainyday" ? Game.A_RAINY_DAY : mode === "stormynightmare" ? Game.A_STORMY_NIGHTMARE : null;
+  const mode = params.mode;
+  const gamemode = mode === Game.A_RAINY_DAY.getId() ? Game.A_RAINY_DAY : mode === Game.A_STORMY_NIGHTMARE.getId() ? Game.A_STORMY_NIGHTMARE : undefined
   if (!gamemode) {
     return redirect("/home");
   }
+  const router = useRouter();
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-blue-100 to-blue-300">
@@ -23,15 +31,15 @@ export default function Page({ params }: { params: { mode: string } }) {
           {gamemode.getName()}
         </h1>
         <div className="flex flex-row mx-auto mt-6 gap-8">
-          {gamemode.getRules().map((rule) => (
-            <div className="flex flex-row items-center gap-2">
+          {gamemode.getRules().map((rule, i) => (
+            <div className="flex flex-row items-center gap-2" key={i}>
               <rule.icon className="w-10 h-10" />
               <p className="text-xl">{rule.description}</p>
             </div>
           ))}
         </div>
       </div>
-      <Tabs className="mx-auto px-32 w-full" defaultValue="easy">
+      <Tabs className="mx-auto px-32 w-full" defaultValue={Game.EASY.getId()}>
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value={Game.PEACEFUL.getId()}>{Game.PEACEFUL.getName()}</TabsTrigger>
           <TabsTrigger value={Game.EASY.getId()}>{Game.EASY.getName()}</TabsTrigger>
@@ -39,7 +47,7 @@ export default function Page({ params }: { params: { mode: string } }) {
           <TabsTrigger value={Game.HARD.getId()}>{Game.HARD.getName()}</TabsTrigger>
         </TabsList>
         {[Game.PEACEFUL, Game.EASY, Game.MEDIUM, Game.HARD].map((difficulty) => (
-          <TabsContent value={difficulty.getId()}>
+          <TabsContent value={difficulty.getId()} key={difficulty.getId()}>
             <Card>
               <CardHeader>
                 <CardTitle className="text-xl">{difficulty.getName()}</CardTitle>
@@ -60,7 +68,9 @@ export default function Page({ params }: { params: { mode: string } }) {
                     < DangerTriangle className="w-6 h-6" />
                     <p className="text-sm">This educational process may cause some discomfort</p>
                   </div>
-                  < Button className="mt-4 mx-auto align-middle w-1/12">Start</Button>
+                  <Button className="mt-4 mx-auto align-middle w-1/12" onClick={() => { handleClick(difficulty.getId()); router.push("/game/" + mode) }}>
+                    Start
+                  </Button>
                 </div>
               </CardFooter>
             </Card>

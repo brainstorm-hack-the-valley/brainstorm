@@ -27,7 +27,7 @@ export default memo(function GameClouds() {
 })
 
 function Sky() {
-  const ref = useRef<THREE.Group<THREE.Object3DEventMap>>()
+  const ref = useRef<THREE.Group<THREE.Object3DEventMap>>(null)
   const cloud0 = useRef()
   // const { color, x, y, z, range, ...config } = useControls({
   //   seed: { value: 1, min: 1, max: 100, step: 1 },
@@ -57,8 +57,10 @@ function Sky() {
     range: 400,
   }
   useFrame((state, delta) => {
-    ref.current.rotation.y = Math.cos(state.clock.elapsedTime / 2) / 2
-    ref.current.rotation.x = Math.sin(state.clock.elapsedTime / 2) / 2
+    if (ref.current) {
+      ref.current.rotation.y = Math.cos(state.clock.elapsedTime / 2) / 2
+      ref.current.rotation.x = Math.sin(state.clock.elapsedTime / 2) / 2
+    }
     // cloud0.current.rotation.y -= delta 
   })
   return (
