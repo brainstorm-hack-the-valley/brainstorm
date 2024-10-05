@@ -1,13 +1,17 @@
+'use client';
 import React from 'react';
 import { Cloud, CloudRain, CloudLightning, Ship, Sun, Timer, TimerOff, X, TimerOffIcon } from 'lucide-react';
 import { LightningBoltIcon } from '@radix-ui/react-icons';
 import Header from '../../components/ui/header';
+import { useRouter } from "next/navigation";
 
 export default function Home() {
+    const router = useRouter();
+
     return (
-        <div>
+        <div className="min-h-screen flex flex-col bg-gradient-to-b from-blue-100 to-blue-300">
             <Header />
-        <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-blue-100 to-blue-300">
+        <div className="flex flex-col items-center justify-center mt-16">
             <h1 className="text-4xl font-bold text-blue-700 mb-2">Welcome Back!</h1>
 
       {/* Cloud with Text */}
@@ -24,7 +28,8 @@ export default function Home() {
             </div>
 
       {/* Cards */}
-            <div className="flex flex-col md:flex-row gap-6">
+            <div className="flex flex-col md:flex-row gap-6"
+            onClick={() => router.push("/gameinfo/rainyday")}>
             {/* First Card with Rain Icon and Ship */}
             <div className="relative group bg-white shadow-md rounded-lg p-6 w-80 overflow-hidden">
             {/* Card Content */}
@@ -39,7 +44,7 @@ export default function Home() {
             </div>
 
           {/* Overlay for Hover Effect */}
-            <div className="absolute inset-0 flex flex-col items-center justify-center transition-opacity duration-300 opacity-0 group-hover:opacity-100 z-10 bg-white">
+            <div className="absolute inset-0 flex flex-col items-center justify-center transition-opacity duration-300 opacity-0 group-hover:opacity-100 z-10 bg-white cursor-pointer">
                 <h3 className="text-xl font-semibold mb-2">A Rainy Day</h3>
                 <div className="flex items-center mb-2 justify-start w-full ml-2">
                     <TimerOff className="w-12 h-12 text-green-500 mr-2" />
@@ -53,7 +58,8 @@ export default function Home() {
         </div>
 
         {/* Second Card with Storm Icon and Ship */}
-        <div className="relative group bg-white shadow-md rounded-lg p-6 w-80 overflow-hidden">
+        <div className="relative group bg-white shadow-md rounded-lg p-6 w-80 overflow-hidden"
+            onClick={() => router.push("/gameinfo/stormynightmare")}>
           {/* Card Content */}
             <h3 className="text-xl font-semibold mb-4">A Stormy Nightmare</h3>
             <CloudLightning className="w-20 h-20 mx-auto mb-2 text-yellow-500" />
@@ -66,7 +72,7 @@ export default function Home() {
             </div>
 
           {/* Overlay for Hover Effect */}
-            <div className="absolute inset-0 flex flex-col items-center justify-center transition-opacity duration-300 opacity-0 group-hover:opacity-100 z-10 bg-white">
+            <div className="absolute inset-0 flex flex-col items-center justify-center transition-opacity duration-300 opacity-0 group-hover:opacity-100 z-10 bg-white cursor-pointer">
                 <h3 className="text-xl font-semibold mb-2">A Stormy Nightmare</h3>
                 <div className="flex items-center mb-2 justify-start w-full ml-2">
                 <Timer className="w-12 h-12 text-yellow-500 mr-2" />
