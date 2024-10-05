@@ -24,9 +24,10 @@ export default function Page({ params }: { params: { mode: string } }) {
   const router = useRouter();
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-b from-blue-100 to-blue-300">
+    <div className="min-h-screen flex flex-col bg-white">
       < Header />
-      <div className="block mx-auto my-8">
+      <div className="flex flex-col items-center justify-center">
+      <div className="block mx-auto my-8 ">
         <h1 className="text-3xl font-bold w-full text-center">
           {gamemode.getName()}
         </h1>
@@ -77,6 +78,7 @@ export default function Page({ params }: { params: { mode: string } }) {
           </TabsContent>
         ))}
       </Tabs>
+    </div>
     </div>
   )
 }

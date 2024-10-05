@@ -18,7 +18,7 @@ function handleClick(gamemode: string) {
 export default function Home() {
     router = useRouter();
     return (
-        <div className="min-h-screen flex flex-col bg-blue-200">
+        <div className="min-h-screen flex flex-col bg-white">
             <Header />
             <div className="flex flex-col items-center justify-center mt-16">
                 <h1 className="text-4xl font-bold text-blue-700 mb-2">Welcome Back!</h1>
@@ -26,7 +26,7 @@ export default function Home() {
                 {/* Cloud with Text */}
                 <div className="relative flex items-center justify-center mb-4">
                     {/* Cloud Icon */}
-                    <Cloud className="w-80 h-60 text-white fill-current" />
+                    <Cloud className="w-80 h-60 text-blue-100 fill-current" />
 
                     {/* Text over Cloud */}
                     <div className="absolute flex items-center justify-center w-full h-full">
@@ -37,7 +37,7 @@ export default function Home() {
                 </div>
 
                 {/* Cards */}
-                <div className="flex flex-col md:flex-row gap-6">
+                <div className="flex flex-col md:flex-row gap-6 rounded-lg shadow-md bg-blue-100 p-5">
                     {/* First Card with Rain Icon and Ship */}
                     <div className="relative group bg-white shadow-md rounded-lg p-6 w-80 overflow-hidden"
                         onClick={() => handleClick(Game.A_RAINY_DAY.getId())}>

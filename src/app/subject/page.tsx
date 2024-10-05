@@ -16,7 +16,7 @@ function handleClick(subject: string) {
 export default function Subject() {
     router = useRouter();
     return (
-        <div className="min-h-screen flex flex-col bg-blue-200">
+        <div className="min-h-screen flex flex-col bg-white">
             <Header />
             {/* Text over Cloud */}
             <div className="pt-10 flex flex-col items-center justify-center w-full h-full">
@@ -24,9 +24,9 @@ export default function Subject() {
                     Choose A Subject
                 </h1>
             </div>
-            <div className="flex flex-col items-center justify-center mt-16">
+            <div className="relative flex flex-col items-center justify-center mt-16">
                 {/* Cards */}
-                <div className="flex flex-col md:flex-row gap-6">
+                <div className="flex flex-col md:flex-row gap-6 rounded-lg shadow-md bg-blue-100 p-5">
                     {/* First Card with Rain Icon and Ship */}
                     <div className="relative group bg-white shadow-md rounded-lg p-6 w-80 overflow-hidden"
                         onClick={() => handleClick("Discrete Math")}>
