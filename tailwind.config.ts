@@ -55,7 +55,18 @@ const config: Config = {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',
   			sm: 'calc(var(--radius) - 4px)'
-  		}
+  		},
+				keyframes: {
+					rock: {
+							'0%, 100%': { transform: 'rotate(5deg) translateX(8px)' },
+							'25%': { transform: 'rotate(-5deg) translateX(-8px)' },
+							'50%': { transform: 'rotate(5deg) translateX(8px)' },
+							'75%': { transform: 'rotate(-5deg) translateX(-8px)' },
+					},
+				},
+				animation: {
+						shake: 'rock 1s ease-in-out infinite', // 1s duration, ease-in-out, infinite loop
+				},
   	}
   },
   plugins: [require("tailwindcss-animate")],

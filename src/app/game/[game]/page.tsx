@@ -13,6 +13,11 @@ import PirateShip from "@/assets/pirate_ship.png"
 import { BrainstormQuestion, getGamemodeById } from "@/game/game"
 import { redirect } from "next/navigation"
 import Timer from "@/components/timer"
+import boat0 from '@/assets/boat0.png';
+import boat1 from '@/assets/boat1.png';
+import boat2 from '@/assets/boat2.png';
+import boat3 from '@/assets/boat3.png';
+const boatImages = [boat0, boat1, boat2, boat3];
 
 function AnswerButton(props: { answer: string }) {
     const { answer } = props
@@ -94,12 +99,43 @@ export default function Component({ params }: { params: { game: string } }) {
         })
     }, [])
 
+    const question = questions[gameState.question - 1] as BrainstormQuestion
+
+    // Boat effect (shaking)
+    const [isShaking, setIsShaking] = useState(false);
+    const startShaking = () => {
+        setIsShaking(true);
+        // Stop animation after 2 seconds
+        setTimeout(() => {
+            setIsShaking(false);
+        }, 1000);
+    };
+
+    // Boat effect (fire)
+    const [boatFire, setBoatFire] = useState(0);
+    const incrementFire = () => {
+        if (boatFire < 3) {
+            const newFireLevel = boatFire + 1;
+            setBoatFire(newFireLevel);
+        }
+    };
+
+    // Set to a specific value
+    const setFire = (n: number) => {
+        if (n <= 3 && n >=0) {
+            setBoatFire(n);
+        }
+    };
+
+    function handleClick2() {
+        startShaking();
+        incrementFire();
+    }
+
     if (loading) {
         return <div>Loading...</div>
     }
-
-    const question = questions[gameState.question - 1] as BrainstormQuestion
-
+    
     return (
         <div className="relative flex flex-col min-h-screen bg-white">
             <GameClouds />
@@ -110,9 +146,13 @@ export default function Component({ params }: { params: { game: string } }) {
                 <h1 className="mx-auto text-xl tracking-normal">{`Question ${gameState.question}/10`}</h1>
             </header>
             <main className="flex mt-8">
-                <div className="basis-1/4">
-                    {/* <Image width={200} height={200} alt="pirate ship" src={PirateShip}
-             className="w-full" /> */}
+                <div className="basis-1/4 flex flex-col items-center justify-center h-screen">
+                    <Image 
+                        width={200} height={200} 
+                        alt="sailboat" 
+                        src={boatImages[boatFire]}
+                        className={`w-full ${isShaking ? 'animate-shake' : ''}`}
+                    />
                 </div>
                 <div className="basis-1/2">
                     <Card className="rounded-xl shadow-lg">
@@ -131,6 +171,12 @@ export default function Component({ params }: { params: { game: string } }) {
                 </div>
                 <div className="basis-1/4 flex flex-col items-center justify-center">
                     <Timer startTime={10} paused={false} />
+                    <button
+                        onClick={handleClick2}
+                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                    >
+                        Click Me
+                    </button>
                 </div>
             </main>
         </div>
