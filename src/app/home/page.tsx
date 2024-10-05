@@ -1,9 +1,12 @@
 import React from 'react';
 import { Cloud, CloudRain, CloudLightning, Ship, Sun, Timer, TimerOff, X, TimerOffIcon } from 'lucide-react';
 import { LightningBoltIcon } from '@radix-ui/react-icons';
+import Header from '../../components/ui/header';
 
 export default function Home() {
     return (
+        <div>
+            <Header />
         <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-blue-100 to-blue-300">
             <h1 className="text-4xl font-bold text-blue-700 mb-2">Welcome Back!</h1>
 
@@ -80,6 +83,7 @@ export default function Home() {
                 <p className="text-gray-600 mr-5 px-2">Running out of time might be shocking.</p>
             </div>
         </div>
+    </div>
     </div>
     </div>
     </div>
