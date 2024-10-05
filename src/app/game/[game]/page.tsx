@@ -12,7 +12,6 @@ import Image from "next/image"
 import PirateShip from "@/assets/pirate_ship.png"
 import { BrainstormQuestion, getGamemodeById } from "@/game/game"
 import { redirect } from "next/navigation"
-import { useEffect, useState } from "react"
 import Timer from "@/components/timer"
 
 function AnswerButton(props: { answer: string }) {

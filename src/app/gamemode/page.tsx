@@ -9,7 +9,7 @@ export default function Home() {
     const router = useRouter();
 
     return (
-        <div className="min-h-screen flex flex-col bg-gradient-to-b from-blue-100 to-blue-300">
+        <div className="min-h-screen flex flex-col bg-blue-200">
             <Header />
         <div className="flex flex-col items-center justify-center mt-16">
             <h1 className="text-4xl font-bold text-blue-700 mb-2">Welcome Back!</h1>
