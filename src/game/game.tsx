@@ -45,6 +45,11 @@ export const A_RAINY_DAY = new BrainStormGamemode("a-rainy-day", "A Rainy Day", 
 export const A_STORMY_NIGHTMARE = new BrainStormGamemode("a-stormy-nightmare", "A Stormy Nightmare", "stormy_nightmare.png",
     [new Rule(TimerIcon, "You have 5-10s to answer each question."), new Rule(CloudLightningIcon, "Running out of time might be shocking.")])
 
+const ALL_GAMEMODES = [A_RAINY_DAY, A_STORMY_NIGHTMARE]
+
+export function getGamemodeById(id: string) {
+    return ALL_GAMEMODES.find(gamemode => gamemode.getId() === id)
+}
 
 class BrainStormDifficulty {
     id: string
@@ -79,3 +84,9 @@ export const PEACEFUL = new BrainStormDifficulty("peaceful", "Peaceful", 10, 0)
 export const EASY = new BrainStormDifficulty("easy", "Easy", 10, 10)
 export const MEDIUM = new BrainStormDifficulty("medium", "Medium", 7, 20)
 export const HARD = new BrainStormDifficulty("hard", "Hard", 5, 30)
+
+export type BrainstormQuestion = {
+    question: string
+    options: string[]
+    answer: string
+}

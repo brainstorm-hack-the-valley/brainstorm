@@ -5,16 +5,17 @@ import { useRef } from "react"
 import { Canvas, useFrame } from "@react-three/fiber"
 import { Clouds, Cloud, CameraControls, Sky as SkyImpl, StatsGl } from "@react-three/drei"
 // import { useControls } from "leva"
+import { memo } from 'react';
 
-export default function GameClouds({ ...props }) {
-  const { className, ...rest } = props
+export default memo(function GameClouds() {
+  // const { className, ...rest } = props
   return (
     <Canvas camera={{ position: [0, -10, 10], fov: 75 }} 
       className={"pointer-events-none"}
       style={{position: "absolute", height: "100vh", opacity: "100%", background: "transparent", pointerEvents: "none"}} 
       gl={{ alpha: true}}
     >
-      <StatsGl />
+      {/* <StatsGl /> */}
       <Sky />
       <ambientLight intensity={Math.PI / 1.5} />
       <spotLight position={[0, 40, 0]} decay={0} distance={45} penumbra={1} intensity={100} />
@@ -23,7 +24,7 @@ export default function GameClouds({ ...props }) {
       <CameraControls />
     </Canvas>
   )
-}
+})
 
 function Sky() {
   const ref = useRef<THREE.Group<THREE.Object3DEventMap>>()
