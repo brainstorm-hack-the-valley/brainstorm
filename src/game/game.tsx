@@ -10,7 +10,7 @@ class Rule {
     }
 }
 
-class BrainStormGamemode {
+export class BrainStormGamemode {
     id: string
     name: string
     image: string
@@ -51,7 +51,7 @@ export function getGamemodeById(id: string) {
     return ALL_GAMEMODES.find(gamemode => gamemode.getId() === id)
 }
 
-class BrainStormDifficulty {
+export class BrainStormDifficulty {
     id: string
     name: string
     timer: number
@@ -84,6 +84,12 @@ export const PEACEFUL = new BrainStormDifficulty("peaceful", "Peaceful", 10, 0)
 export const EASY = new BrainStormDifficulty("easy", "Easy", 10, 10)
 export const MEDIUM = new BrainStormDifficulty("medium", "Medium", 7, 20)
 export const HARD = new BrainStormDifficulty("hard", "Hard", 5, 30)
+
+const ALL_DIFFICULTIES = [PEACEFUL, EASY, MEDIUM, HARD]
+
+export function getDifficultyById(id: string) {
+    return ALL_DIFFICULTIES.find(difficulty => difficulty.getId() === id)
+}
 
 export type BrainstormQuestion = {
     question: string
