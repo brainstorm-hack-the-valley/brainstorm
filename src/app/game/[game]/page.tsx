@@ -1,19 +1,44 @@
+'use client';
 import { Button } from "@/components/ui/button"
+import { useState, useEffect } from "react"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
 import { ArrowRight, CheckCircle, Smartphone, Zap, Shield } from "lucide-react"
+import { LightningBoltIcon } from "@radix-ui/react-icons"
 import Link from "next/link"
 import GameClouds from "@/components/brainstorm/GameClouds"
 import Image from "next/image"
 import PirateShip from "@/assets/pirate_ship.png"
+import Timer from "@/components/timer"
 
 function AnswerButton(props: { answer: string }) {
     const { answer } = props
+    const [isClient, setIsClient] = useState(false);
+    const rndInt = Math.floor(Math.random() * 3) + 1
+    useEffect(() => {
+      setIsClient(true); // This will trigger a re-render on the client
+    }, []);
+    const icons = []
+    for (let i = 0; i < rndInt; i++) {
+        icons.push(<LightningBoltIcon key={i} className="p-2 w-10 h-10 text-yellow-500 fill-current" />)
+    }
     return (
-        <Button className="rounded-xl w-auto h-36 text-xl">
-            {answer}
-        </Button>
+        <Button
+          className="relative rounded-xl w-auto h-36 text-xl flex flex-col justify-center items-center"
+          onClick={() => handleClick(rndInt)}
+        >
+        <p className="text-center">{answer}</p>
+        {isClient && (
+          <div className="absolute bottom-0 right-0 mb-2 mr-2 flex items-center justify-center rounded-full bg-yellow-100">
+            {icons}
+          </div>
+        )}
+      </Button>
     )
+}
+
+function handleClick(rndInt: number) {
+    console.log("Clicked")
 }
 
 export default function Component() {
@@ -29,7 +54,7 @@ export default function Component() {
       <main className="flex mt-8">
         <div className="basis-1/4">
             <Image width={200} height={200} alt="pirate ship" src={PirateShip}
-             className="w-full" />
+              className="w-full" />
         </div>
         <div className="basis-1/2">
             <Card className="rounded-xl shadow-lg">
@@ -40,14 +65,14 @@ export default function Component() {
                 </CardContent>
             </Card>
             <div className="grid grid-cols-2 grid-rows-2 mt-8 gap-8">
-                <AnswerButton answer="Paris" />
+                <AnswerButton answer="Paris"/>
                 <AnswerButton answer="London" />
                 <AnswerButton answer="Berlin" />
                 <AnswerButton answer="Madrid" />
             </div>
         </div>
-        <div className="basis-1/4">
-
+        <div className="basis-1/4 flex flex-col items-center justify-center">
+          <Timer startTime={10} paused={false} />
         </div>
       </main>
     </div>

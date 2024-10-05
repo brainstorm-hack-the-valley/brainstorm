@@ -15,7 +15,7 @@ const Timer: React.FC<TimerProps> = ({ startTime, paused }) => {
   useEffect(() => {
     // Automatically start the timer when the component mounts
     interval = setInterval(() => {
-      setTimeLeft(prevTime => {
+      setTimeLeft((prevTime) => {
         if (prevTime <= 1) {
           clearInterval(interval); // Clear interval when time reaches 0
           return 0; // Set time left to 0
@@ -37,7 +37,7 @@ const Timer: React.FC<TimerProps> = ({ startTime, paused }) => {
   return (
     <div className="flex flex-col items-center justify-center p-4">
       <div
-        className="relative w-16 h-40 border-4 border-blue-500 rounded overflow-hidden"
+        className="relative w-24 h-80 border-4 border-blue-500 rounded overflow-hidden" // Increased height from h-40 to h-80
         style={{
           backgroundImage: "url('https://www.transparenttextures.com/patterns/white-paper.png')",
           backgroundSize: 'cover',
