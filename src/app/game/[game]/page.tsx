@@ -13,10 +13,12 @@ import PirateShip from "@/assets/pirate_ship.png"
 import { BrainStormDifficulty, BrainStormGamemode, BrainstormQuestion, getDifficultyById, getGamemodeById, PEACEFUL } from "@/game/game"
 import { redirect } from "next/navigation"
 import Timer from "@/components/timer"
+import TimerLightning from "@/components/timerLightning"
 import boat0 from '@/assets/boat0.png';
 import boat1 from '@/assets/boat1.png';
 import boat2 from '@/assets/boat2.png';
 import boat3 from '@/assets/boat3.png';
+import lightning from '@/assets/lightning.png';
 const boatImages = [boat0, boat1, boat2, boat3];
 import { connectFlipper, disconnectFlipper, readFlipperResponse, sendFlipperCommand } from "@/flipper/flipper"
 import { randInt } from "three/src/math/MathUtils.js"
@@ -182,15 +184,20 @@ export default function Component({ params }: { params: { game: string } }) {
     })
   }
 
-  // Boat effect (shaking)
-  const [isShaking, setIsShaking] = useState(false);
-  const startShaking = () => {
-    setIsShaking(true);
-    // Stop animation after 2 seconds
-    setTimeout(() => {
-      setIsShaking(false);
-    }, 1000);
-  };
+    // Boat effect (shaking)
+    const [isShaking, setIsShaking] = useState(false);
+    const [isLightning, setIsLightning] = useState(false);
+    const startShaking = () => {
+        setIsShaking(true);
+        setIsLightning(true);
+        // Stop animation after 2 seconds
+        setTimeout(() => {
+            setIsLightning(false);
+        }, 200);
+        setTimeout(() => {
+            setIsShaking(false);
+        }, 1000);
+    };
 
   // Boat effect (fire)
   const [boatFire, setBoatFire] = useState(0);
@@ -224,19 +231,30 @@ export default function Component({ params }: { params: { game: string } }) {
             <header className="py-4 px-4 lg:px-6 h-14 grid grid-cols-3 text-3xl 
       font-bold tracking-tighter">
                 <span></span>
-                <h1 className="mx-auto">{game.name}</h1>
-                <h1 className="mx-auto text-xl tracking-normal">{`Question ${questionNumber}/10`}</h1>
+                <h1 className="mx-auto text-red-300">{game.name}</h1>
+                <h1 className="mx-auto text-red-500 text-xl tracking-normal">{`Question ${questionNumber}/10`}</h1>
             </header>
-            <main className="flex mt-8">
-                <div className="basis-1/4 flex flex-col items-center justify-center h-screen">
-                    <Image 
-                        width={200} height={200} 
-                        alt="sailboat" 
-                        src={boatImages[boatFire]}
-                        className={`w-full ${isShaking ? 'animate-shake' : ''}`}
+            <div className="absolute w-1/4 h-screen flex flex-col items-center">
+                {isLightning && (
+                    <Image
+                        width={280}
+                        alt="lightning" 
+                        src={lightning}
+                        className="absolute pl-5 h-3/4"
                     />
+                )}
+                <Image 
+                    width={200} height={200} 
+                    alt="sailboat" 
+                    src={boatImages[boatFire]}
+                    className={`w-full ${isShaking ? 'animate-shake' : ''}`}
+                    style={{ marginTop: '66.66%' }}
+                />
+            </div>
+            <main className="absolute grid grid-cols-4 mt-8 h-screen w-screen">
+                <div>
                 </div>
-                <div className="basis-1/2">
+                <div className="col-span-2 mt-20">
                     {
                         !flipperPort && (
                             <div className="flex justify-center items-center">
@@ -271,9 +289,7 @@ export default function Component({ params }: { params: { game: string } }) {
                         ) 
                     }
                 </div>
-                <div className="basis-1/4 flex flex-col items-center justify-center">
-                    <Timer startTime={10} paused={false} handleTimeout={handleTimeout}/>
-                </div>
+                {<TimerLightning startTime={30} paused={false} />}
             </main>
         </div>
     )
