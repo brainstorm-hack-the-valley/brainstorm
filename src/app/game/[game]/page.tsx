@@ -67,12 +67,6 @@ export default function Component({ params }: { params: { game: string } }) {
   }
   const router = useRouter()
 
-  const topic = window.localStorage.getItem("subject")
-  const difficulty = window.localStorage.getItem("difficulty")
-  if (!topic || !difficulty) {
-    redirect("/")
-  }
-
   const [gameState, setGameState] = useState({
     question: 1
   })
@@ -91,23 +85,31 @@ export default function Component({ params }: { params: { game: string } }) {
   const [questions, setQuestions] = useState<BrainstormQuestion[]>([])
   const [loading, setLoading] = useState(true)
   const [flipperPort, setFlipperPort] = useState<any>(null)
+  const [topic, setTopic] = useState("General Knowledge")
+
   useEffect(() => {
     let difficultyId = window.localStorage.getItem("difficulty")
-    if (difficultyId === null) {
+    if (!difficultyId) {
       difficultyId = PEACEFUL.id
       window.localStorage.setItem("difficulty", difficultyId)
     }
-
     const gameDifficulty = getDifficultyById(difficultyId as string)
-    if (gameDifficulty === undefined) {
-      redirect("/home")
+    if (!gameDifficulty) {
+      redirect("/")
     }
     setGameDifficulty(gameDifficulty)
+
+    let topic = window.localStorage.getItem("subject")
+    if (!topic) {
+        topic = "General Knowledge"
+        window.localStorage.setItem("subject", topic)
+    }
+    setTopic(topic)
 
     if (fetched) {
       return
     }
-    fetch(`/api/generate?topic=${topic}&difficulty=${difficulty}`).then(response => {
+    fetch(`/api/generate?topic=${topic}&difficulty=${gameDifficulty.getId()}`).then(response => {
       if (!response.ok) {
         console.log("Failed to fetch questions")
         fetched = false
@@ -252,13 +254,15 @@ export default function Component({ params }: { params: { game: string } }) {
     }
   }, [pauseTime]);
 
-  function finishGame() {
+  function finishGame(shock: boolean=false) {
     if (gameFinishing) {
       return
     }
     setGameFinishing(true)
-    startShaking()
-    sendShock(flipperPort, game as BrainStormGamemode, gameDifficulty as BrainStormDifficulty, 3)
+    if (shock) {
+        startShaking()
+        sendShock(flipperPort, game as BrainStormGamemode, gameDifficulty as BrainStormDifficulty, 3)
+    }   
 
     setTimeout(() => {
         const numShocks = game == A_STORMY_NIGHTMARE ? incorrectAnswers : 1;
@@ -288,12 +292,12 @@ export default function Component({ params }: { params: { game: string } }) {
     }
     if (game == A_RAINY_DAY && incorrectAnswers >= 3) {
         console.log("Finishing game due to incorrect answers")
-        finishGame()
+        finishGame(true)
         return;
     }
     if (game == A_STORMY_NIGHTMARE && timeLeft <= 0) {
         console.log("Finishing game due to no time left")
-        finishGame()
+        finishGame(true)
         return;
     }
 
