@@ -19,19 +19,6 @@ export async function GET(request: NextRequest) {
       difficulty = "obscure and difficult";
     }
 
-    if (false) {
-      const questions = [
-        { "question": "What is the capital of France?", "options": ["Paris", "London", "Berlin", "Madrid"], "answer": "Paris" },
-        { "question": "What is the capital of the United States?", "options": ["Washington D.C.", "New York", "Los Angeles", "Chicago"], "answer": "Washington D.C." },
-        { "question": "What is the capital of Japan?", "options": ["Tokyo", "Osaka", "Kyoto", "Hiroshima"], "answer": "Tokyo" },
-        { "question": "What is the capital of Brazil?", "options": ["Brasilia", "Rio de Janeiro", "Sao Paulo", "Salvador"], "answer": "Brasilia" },
-        { "question": "What is the capital of Australia?", "options": ["Canberra", "Sydney", "Melbourne", "Brisbane"], "answer": "Canberra" },
-        { "question": "What is the capital of India?", "options": ["New Delhi", "Mumbai", "Bangalore", "Kolkata"], "answer": "New Delhi" },
-        { "question": "What is the capital of China?", "options": ["Beijing", "Shanghai", "Guangzhou", "Shenzhen"], "answer": "Beijing" },
-      ]
-      return NextResponse.json({ success: true, data: questions }, { status: 200 });
-    }
-
     const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
     const completion = await openai.chat.completions.create({
