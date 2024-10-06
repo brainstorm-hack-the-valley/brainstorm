@@ -29,11 +29,11 @@ import { useRouter } from "next/navigation"
 
 function AnswerButton(props: {
   answer: string,
+  shockLevel: number,
   answerCallback: (answer: string, shockLevel: number) => void
 }) {
-  const { answer, answerCallback } = props
+  const { answer, shockLevel, answerCallback } = props
   const [isClient, setIsClient] = useState(false);
-  const shockLevel = Math.floor(Math.random() * 3) + 1
 
   useEffect(() => {
     setIsClient(true); // This will trigger a re-render on the client
@@ -75,18 +75,20 @@ export default function Component({ params }: { params: { game: string } }) {
   const [gameState, setGameState] = useState({
     question: 1
   })
+  const startTime = 30;
   const [gameDifficulty, setGameDifficulty] = useState<BrainStormDifficulty>(PEACEFUL)
   const [questionNumber, setQuestionNumber] = useState(1)
   const [incorrectAnswers, setIncorrectAnswers] = useState(0)
-  const [timeLeft, setTimeLeft] = useState(10)
+  const [timeLeft, setTimeLeft] = useState(startTime); // Set the total time based on the prop
+  const [pauseTime, setPauseTime] = useState(false); // Set the pause time based on the prop
   const [correct, setCorrect] = useState(false)
   const [showFeedback, setShowFeedback] = useState(false)
+  const [shockValues, setShockValues] = useState([0, 0, 0, 0])
 
 
   const [questions, setQuestions] = useState<BrainstormQuestion[]>([])
   const [loading, setLoading] = useState(true)
   const [flipperPort, setFlipperPort] = useState<any>(null)
-
   useEffect(() => {
     let difficultyId = window.localStorage.getItem("difficulty")
     if (difficultyId === null) {
@@ -153,7 +155,6 @@ export default function Component({ params }: { params: { game: string } }) {
         if (showFeedback) {
             return  
         }
-
         console.log(`Answered ${answer} with shock level ${shockLevel}`)
         const correct = answer === question.answer
         const nextQuestionNumber = (questionNumber % questions.length) + 1
@@ -161,11 +162,14 @@ export default function Component({ params }: { params: { game: string } }) {
         setIncorrectAnswers(nextIncorrect)
         setCorrect(correct)
         setShowFeedback(true)
+        generateShockValues()
         if (!correct) {
             sendShock(flipperPort, game as BrainStormGamemode, 
-                      gameDifficulty as BrainStormDifficulty, shockLevel)
+                        gameDifficulty as BrainStormDifficulty, shockLevel)
             startShaking()
             incrementFire()
+        } else {
+            setTimeLeft(timeLeft + 5)
         }
         setTimeout(() => {
             // if (questionNumber > nextQuestionNumber) {
@@ -173,10 +177,17 @@ export default function Component({ params }: { params: { game: string } }) {
             //     return
             // }
             setQuestionNumber(nextQuestionNumber)
-            setTimeLeft(10)
             setShowFeedback(false)
         }, 1000)
     }
+
+  function generateShockValues() {
+    let s0 = Math.floor(Math.random() * 3) + 1;
+    let s1 = Math.floor(Math.random() * 3) + 1;
+    let s2 = Math.floor(Math.random() * 3) + 1;
+    let s3 = Math.floor(Math.random() * 3) + 1;
+    setShockValues([s0, s1, s2, s3])
+  }
 
   function connectToFlipper() {
     connectFlipper(true).then(port => {
@@ -215,6 +226,32 @@ export default function Component({ params }: { params: { game: string } }) {
     }
   };
 
+  let interval: NodeJS.Timeout;
+
+  useEffect(() => {
+    // GenerateShockValues
+    generateShockValues()
+    // Automatically start the timer when the component mounts
+    interval = setInterval(() => {
+      setTimeLeft((prevTime) => {
+        if (prevTime <= 1) {
+          clearInterval(interval); // Clear interval when time reaches 0
+          return 0; // Set time left to 0
+        }
+        return prevTime - 1; // Decrease time left by 1 second
+      });
+    }, 1000);
+
+    return () => clearInterval(interval); // Cleanup interval on unmount
+  }, []);
+
+  useEffect(() => {
+    // Pause the timer when the pauseTime prop is true
+    if (pauseTime) {
+      clearInterval(interval);
+    }
+  }, [pauseTime]);
+
     if (loading) {
         return <div>Loading...</div>
     }
@@ -224,6 +261,7 @@ export default function Component({ params }: { params: { game: string } }) {
         router.push("/endscreen");
         return;
     }
+
     
     return (
         <div className="relative flex flex-col min-h-screen">
@@ -280,16 +318,16 @@ export default function Component({ params }: { params: { game: string } }) {
                                 </CardContent>
                                 </Card>
                                 <div className="grid grid-cols-2 grid-rows-2 mt-8 gap-8">
-                                    <AnswerButton answer={question.options[0]} answerCallback={handleAnswer} />
-                                    <AnswerButton answer={question.options[1]} answerCallback={handleAnswer} />
-                                    <AnswerButton answer={question.options[2]} answerCallback={handleAnswer} />
-                                    <AnswerButton answer={question.options[3]} answerCallback={handleAnswer} />
+                                    <AnswerButton answer={question.options[0]} shockLevel={shockValues[0]} answerCallback={handleAnswer} />
+                                    <AnswerButton answer={question.options[1]} shockLevel={shockValues[1]} answerCallback={handleAnswer} />
+                                    <AnswerButton answer={question.options[2]} shockLevel={shockValues[2]} answerCallback={handleAnswer} />
+                                    <AnswerButton answer={question.options[3]} shockLevel={shockValues[3]} answerCallback={handleAnswer} />
                                 </div>
                             </>
                         ) 
                     }
                 </div>
-                {<TimerLightning startTime={30} paused={false} />}
+                {<TimerLightning startTime={startTime} remainingTime={timeLeft} paused={false} />}
             </main>
         </div>
     )
