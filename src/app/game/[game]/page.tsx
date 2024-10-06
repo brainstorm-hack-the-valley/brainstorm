@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { useState, useEffect } from "react"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
-import { ArrowRight, CheckCircle, Smartphone, Zap, Shield, Brain, TriangleAlert } from "lucide-react"
+import { ArrowRight, CheckCircle, Smartphone, Zap, Shield, Brain, TriangleAlert, Router } from "lucide-react"
 import { LightningBoltIcon } from "@radix-ui/react-icons"
 import Link from "next/link"
 import GameClouds from "@/components/brainstorm/GameClouds"
@@ -23,6 +23,7 @@ import { randInt } from "three/src/math/MathUtils.js"
 import { sendShock } from "@/app/api/generate/util"
 import CorrectOverlay from "@/components/brainstorm/CorrectOverlay"
 import { start } from "repl"
+import { useRouter } from "next/navigation"
 
 function AnswerButton(props: {
   answer: string,
@@ -67,6 +68,13 @@ export default function Component({ params }: { params: { game: string } }) {
   if (game === undefined) {
     redirect("/home")
   }
+  const router = useRouter()
+
+  const topic = localStorage.getItem("subject")
+  const difficulty = localStorage.getItem("difficulty")
+  if (topic === null || difficulty === null) {
+    redirect("/home")
+  }
 
   const [gameState, setGameState] = useState({
     question: 1
@@ -98,8 +106,7 @@ export default function Component({ params }: { params: { game: string } }) {
     if (fetched) {
       return
     }
-
-    fetch(`/api/generate?topic=capital-cities`).then(response => {
+    fetch(`/api/generate?topic=${topic}&difficulty=${difficulty}`).then(response => {
       if (!response.ok) {
         console.log("Failed to fetch questions")
         fetched = false
@@ -199,6 +206,12 @@ export default function Component({ params }: { params: { game: string } }) {
   if (loading) {
     return <div>Loading...</div>
   }
+  if (questionNumber >= questions.length) {
+    localStorage.setItem("numShock", incorrectAnswers.toString());
+    localStorage.setItem("numCorrect", (10 - incorrectAnswers).toString());
+    router.push("/endscreen");
+    return;
+  }
 
   return (
     <div className="relative flex flex-col min-h-screen bg-white">
@@ -235,7 +248,7 @@ export default function Component({ params }: { params: { game: string } }) {
             )
           }
           {
-            flipperPort !== null && (
+            flipperPort !== null && questionNumber < questions.length && (
               <>
                 <Card className="rounded-xl shadow-lg">
                   <CardContent className="p-6 flex flex-col items-center text-center space-y-4">

@@ -3,9 +3,9 @@ import { OpenAI } from 'openai';
 
 export async function GET(request: NextRequest) {
   try {
-
-    const topic = "Physics";
-    const difficulty = "Hard";
+    const query = request.nextUrl.searchParams;
+    const topic = query.get('topic');
+    const difficulty = query.get('difficulty');
 
     const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
