@@ -1,37 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { OpenAI } from 'openai';
 
 export async function GET(request: NextRequest) {
   try {
-    // TODO: Remove, timeout to test.
-    await new Promise(resolve => setTimeout(resolve, 1000));
 
-    const query = request.nextUrl.searchParams;
-    const question_type = query.get('topic');
+    const topic = "Physics";
+    const difficulty = "Hard";
 
-    if (!question_type) {
-      return NextResponse.json({ success: false, error: 'Invalid question type' }, { status: 400 });
-    }
+    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-    const questions = [
-      {
-        question: 'What is the capital of France?',
-        options: ['Paris', 'London', 'Berlin', 'Madrid'],
-        answer: 'Paris'
-      },
-      {
-        question: 'What is the largest planet in our solar system?',
-        options: ['Earth', 'Mars', 'Jupiter', 'Saturn'],
-        answer: 'Jupiter'
-      },
-      {
-        question: 'What is the powerhouse of the cell?',
-        options: ['Nucleus', 'Mitochondria', 'Ribosome', 'Endoplasmic Reticulum'],
-        answer: 'Mitochondria'
-      }
-    ]
+    const completion = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo",
+      messages: [
+        { role: "system", content: "You are an educational tutor." },
+        {
+          role: "user",
+          content: "Give me 10 " + difficulty + " question about topic " + topic + " with 4 options that are very close to the correct answer and the correct answer. Respond in an array of JSON objects in the form [{ \"question\": \"\", \"options\": [\"\", \"\", \"\", \"\"], \"answer\": \"\" }]. Please do not use any markup.",
+        },
+      ],
+    });
 
-    return NextResponse.json({ success: true, data: questions }, { status: 200 });
+    const question = completion.choices[0].message.content;
+    console.log(question);
 
+    return NextResponse.json({ success: true, data: JSON.parse(question as string)}, { status: 200 });
   } catch (error) {
     return NextResponse.json({ success: false, error: 'Something went wrong' }, { status: 500 });
   }
