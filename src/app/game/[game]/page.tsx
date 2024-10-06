@@ -20,7 +20,7 @@ import boat3 from '@/assets/boat3.png';
 const boatImages = [boat0, boat1, boat2, boat3];
 import { connectFlipper, disconnectFlipper, readFlipperResponse, sendFlipperCommand } from "@/flipper/flipper"
 import { randInt } from "three/src/math/MathUtils.js"
-import { sendShock } from "@/app/api/generate/util"
+import { sendShock } from "@/app/game/[game]/util"
 import CorrectOverlay from "@/components/brainstorm/CorrectOverlay"
 import { start } from "repl"
 import { useRouter } from "next/navigation"
@@ -55,16 +55,6 @@ function AnswerButton(props: {
   )
 }
 
-function handleTimeout() {
-
-}
-
-enum AnswerFeedback {
-  CORRECT,
-  INCORRECT,
-  NONE
-}
-
 export default function Component({ params }: { params: { game: string } }) {
   let fetched = false;
   const gameId = params.game
@@ -74,10 +64,10 @@ export default function Component({ params }: { params: { game: string } }) {
   }
   const router = useRouter()
 
-  const topic = localStorage.getItem("subject")
-  const difficulty = localStorage.getItem("difficulty")
-  if (topic === null || difficulty === null) {
-    redirect("/home")
+  const topic = window.localStorage.getItem("subject")
+  const difficulty = window.localStorage.getItem("difficulty")
+  if (!topic || !difficulty) {
+    redirect("/")
   }
 
   const [gameState, setGameState] = useState({
@@ -87,7 +77,8 @@ export default function Component({ params }: { params: { game: string } }) {
   const [questionNumber, setQuestionNumber] = useState(1)
   const [incorrectAnswers, setIncorrectAnswers] = useState(0)
   const [timeLeft, setTimeLeft] = useState(10)
-  const [feedback, setFeedback] = useState(AnswerFeedback.NONE)
+  const [correct, setCorrect] = useState(false)
+  const [showFeedback, setShowFeedback] = useState(false)
 
 
   const [questions, setQuestions] = useState<BrainstormQuestion[]>([])
@@ -118,7 +109,6 @@ export default function Component({ params }: { params: { game: string } }) {
       }
       response.json().then(data => {
         console.log("Fetched questions")
-        console.log(data)
         setQuestions(data.data)
         setLoading(false)
       })
@@ -157,28 +147,34 @@ export default function Component({ params }: { params: { game: string } }) {
 
   const question = questions[questionNumber - 1] as BrainstormQuestion
 
-  function handleAnswer(answer: string, shockLevel: number) {
-    console.log(`Answered ${answer} with shock level ${shockLevel}`)
-    const correct = answer === question.answer
-    const nextQuestionNumber = questionNumber + 1
-    const nextIncorrect = incorrectAnswers + (correct ? 0 : 1)
-    setQuestionNumber(nextQuestionNumber)
-    setIncorrectAnswers(nextIncorrect)
-    setTimeLeft(10)
-    setFeedback(correct ? AnswerFeedback.CORRECT : AnswerFeedback.INCORRECT)
-    if (!correct) {
-      sendShock(flipperPort, game as BrainStormGamemode, gameDifficulty as BrainStormDifficulty, shockLevel)
-      startShaking()
-      incrementFire()
+    function handleAnswer(answer: string, shockLevel: number) {
+        if (showFeedback) {
+            return  
+        }
+
+        console.log(`Answered ${answer} with shock level ${shockLevel}`)
+        const correct = answer === question.answer
+        const nextQuestionNumber = (questionNumber % questions.length) + 1
+        const nextIncorrect = incorrectAnswers + (correct ? 0 : 1)
+        setIncorrectAnswers(nextIncorrect)
+        setCorrect(correct)
+        setShowFeedback(true)
+        if (!correct) {
+            sendShock(flipperPort, game as BrainStormGamemode, 
+                      gameDifficulty as BrainStormDifficulty, shockLevel)
+            startShaking()
+            incrementFire()
+        }
+        setTimeout(() => {
+            // if (questionNumber > nextQuestionNumber) {
+            //     console.log("Question has changed, not resetting animation.")
+            //     return
+            // }
+            setQuestionNumber(nextQuestionNumber)
+            setTimeLeft(10)
+            setShowFeedback(false)
+        }, 1000)
     }
-    setInterval(() => {
-      if (nextQuestionNumber + 1 >= questionNumber) {
-        console.log("Question has changed, not resetting animation.")
-        return
-      }
-      setFeedback(AnswerFeedback.NONE)
-    }, 1000)
-  }
 
   function connectToFlipper() {
     connectFlipper(true).then(port => {
@@ -212,76 +208,73 @@ export default function Component({ params }: { params: { game: string } }) {
     }
   };
 
-  if (loading) {
-    return <div>Loading...</div>
-  }
-  if (questionNumber >= questions.length) {
-    localStorage.setItem("numShock", incorrectAnswers.toString());
-    localStorage.setItem("numCorrect", (10 - incorrectAnswers).toString());
-    router.push("/endscreen");
-    return;
-  }
-
-  console.log(flipperPort)
-
-  return (
-    <div className="relative flex flex-col min-h-screen">
-      <GameClouds />
-      <CorrectOverlay correct={feedback === AnswerFeedback.CORRECT}
-        className={feedback === AnswerFeedback.NONE ? "opacity-0" : "opacity-100"}
-      />
-      <header className="py-4 px-4 lg:px-6 h-14 grid grid-cols-3 text-3xl 
+    if (loading) {
+        return <div>Loading...</div>
+    }
+    if (questionNumber >= questions.length) {
+        localStorage.setItem("numShock", incorrectAnswers.toString());
+        localStorage.setItem("numCorrect", (10 - incorrectAnswers).toString());
+        router.push("/endscreen");
+        return;
+    }
+    
+    return (
+        <div className="relative flex flex-col min-h-screen">
+            <GameClouds />
+            <header className="py-4 px-4 lg:px-6 h-14 grid grid-cols-3 text-3xl 
       font-bold tracking-tighter">
-        <span></span>
-        <h1 className="mx-auto">{game.name}</h1>
-        <h1 className="mx-auto text-xl tracking-normal">{`Question ${questionNumber}/10`}</h1>
-      </header>
-      <main className="flex mt-8">
-        <div className="basis-1/4 flex flex-col items-center justify-center h-screen">
-          <Image
-            width={200} height={200}
-            alt="sailboat"
-            src={boatImages[boatFire]}
-            className={`w-full ${isShaking ? 'animate-shake' : ''}`}
-          />
-        </div>
-        <div className="basis-1/2">
-          {
-            !flipperPort && (
-              <div className="flex justify-center items-center">
-                <Button className="flex items-center justify-center space-x-2 p-4"
-                  onClick={connectToFlipper}
-                >
-                  <TriangleAlert className="h-6 w-6" />
-                  <span>Please Connect Learning Device</span>
-                </Button>
-              </div>
-            )
-          }
-          {
-            flipperPort && questionNumber < questions.length && (
-              <>
-                <Card className="rounded-xl shadow-lg">
-                  <CardContent className="p-6 flex flex-col items-center text-center space-y-4">
-                    <h1 className="text-2xl font-bold tracking-tighter">
-                      {`${question.question}`}
-                    </h1>
-                  </CardContent>
-                </Card>
-                <div className="grid grid-cols-2 grid-rows-2 mt-8 gap-8">
-                  <AnswerButton answer={question.options[0]} answerCallback={handleAnswer} />
-                  <AnswerButton answer={question.options[1]} answerCallback={handleAnswer} />
-                  <AnswerButton answer={question.options[2]} answerCallback={handleAnswer} />
-                  <AnswerButton answer={question.options[3]} answerCallback={handleAnswer} />
+                <span></span>
+                <h1 className="mx-auto">{game.name}</h1>
+                <h1 className="mx-auto text-xl tracking-normal">{`Question ${questionNumber}/10`}</h1>
+            </header>
+            <main className="flex mt-8">
+                <div className="basis-1/4 flex flex-col items-center justify-center h-screen">
+                    <Image 
+                        width={200} height={200} 
+                        alt="sailboat" 
+                        src={boatImages[boatFire]}
+                        className={`w-full ${isShaking ? 'animate-shake' : ''}`}
+                    />
                 </div>
-              </>
-            )
-          }
+                <div className="basis-1/2">
+                    {
+                        !flipperPort && (
+                            <div className="flex justify-center items-center">
+                                <Button className="flex items-center justify-center space-x-2 p-4"
+                                    onClick={connectToFlipper}
+                                >
+                                    <TriangleAlert className="h-6 w-6" />
+                                    <span>Please Connect Learning Device</span>
+                                </Button>
+                            </div>
+                        )
+                    }
+                    {
+                        flipperPort && (
+                            <>
+                                <Card className={"rounded-xl shadow-lg transition-colors bg-white duration-500 " + 
+                                    (showFeedback ? `${correct ? "bg-green-500" : "bg-red-500"} text-white` : "")}>
+                                <CardContent className="relative p-6 flex flex-col items-center text-center transition-colors">
+                                    {/* <CorrectOverlay correct={correct} show={showFeedback}/> */}
+                                    <h1 className={`text-2xl font-bold tracking-tighter `}>
+                                        {showFeedback ? (correct ? "Correct" : "Incorrect") : `${question.question}`}
+                                    </h1>
+                                </CardContent>
+                                </Card>
+                                <div className="grid grid-cols-2 grid-rows-2 mt-8 gap-8">
+                                    <AnswerButton answer={question.options[0]} answerCallback={handleAnswer} />
+                                    <AnswerButton answer={question.options[1]} answerCallback={handleAnswer} />
+                                    <AnswerButton answer={question.options[2]} answerCallback={handleAnswer} />
+                                    <AnswerButton answer={question.options[3]} answerCallback={handleAnswer} />
+                                </div>
+                            </>
+                        ) 
+                    }
+                </div>
+                <div className="basis-1/4 flex flex-col items-center justify-center">
+                    <Timer startTime={10} paused={false} handleTimeout={handleTimeout}/>
+                </div>
+            </main>
         </div>
-        <div className="basis-1/4 flex flex-col items-center justify-center">
-          <Timer startTime={10} paused={false} handleTimeout={handleTimeout} />
-        </div>
-      </main>
-    </div>
-  )
+    )
 }

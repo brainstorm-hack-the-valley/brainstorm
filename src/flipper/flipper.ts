@@ -6,20 +6,41 @@ export async function connectFlipper(buttonPressed: boolean) {
         return;
     }
 
+    console.log(`Connecting to flipper (button pressed: ${buttonPressed})`);
+
     const navigator = window.navigator as Navigator & { serial: any };
 
     const ports = await navigator.serial.getPorts();
-    let port;
+    let port = null;
     if (ports.length == 0) { 
         if (!buttonPressed) {
             return;
         }
-        port = await navigator.serial.requestPort(); 
-    } else { 
-        port = ports[0];
+    } else {
+        for (const p of ports) {
+            // Flipper vendor id is 0483 and Product ID (PID) is 5740.
+            if (p.getInfo().usbVendorId === 0x483 && p.getInfo().usbProductId === 0x5740) {
+                port = p;
+                console.log(`Found existing flipper on port.`);
+                break;
+            }
+        }
+        if (!port && !buttonPressed) {
+            return
+        }
     }
+    if (!port) {
+        console.log("Requesting flipper port.");
+        port = await navigator.serial.requestPort(); 
+    }
+    if (port.readable) {
+        console.log("Closing existing flipper port.");
+        await port.close();
+    }
+
     await port.open({ baudRate: 230400 });
     console.log(`Connected to flipper on port ${port.getInfo().usbProductId}`);
+
     return port
 }
 

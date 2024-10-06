@@ -27,6 +27,8 @@ export function sendShock(port: any, gamemode: BrainStormGamemode, difficulty: B
         shockLevel = cl;
     }
 
-    const command = `subghz tx_from_file /ext/subghz/R1${vibrate ? 'V' : ''}${shockLevel}.sub 1 0`
+    const shockLevelFill = shockLevel.toString().padStart(2, '0');
+
+    const command = `subghz tx_from_file /ext/subghz/R1${vibrate ? 'V' : ''}${shockLevelFill}.sub 1 0`
     sendFlipperCommand(port, command)
 }
