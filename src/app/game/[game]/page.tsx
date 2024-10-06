@@ -55,6 +55,10 @@ function AnswerButton(props: {
   )
 }
 
+function handleTimeout() {
+
+}
+
 enum AnswerFeedback {
   CORRECT,
   INCORRECT,
@@ -146,6 +150,11 @@ export default function Component({ params }: { params: { game: string } }) {
     readResponse()
   }, [flipperPort])
 
+  function handleTimeout() {
+    console.log("Timeout")
+    sendShock(flipperPort, game as BrainStormGamemode, gameDifficulty as BrainStormDifficulty, 3)
+  }
+
   const question = questions[questionNumber - 1] as BrainstormQuestion
 
   function handleAnswer(answer: string, shockLevel: number) {
@@ -158,7 +167,7 @@ export default function Component({ params }: { params: { game: string } }) {
     setTimeLeft(10)
     setFeedback(correct ? AnswerFeedback.CORRECT : AnswerFeedback.INCORRECT)
     if (!correct) {
-      sendShock(flipperPort, game as BrainStormGamemode, gameDifficulty as BrainStormDifficulty)
+      sendShock(flipperPort, game as BrainStormGamemode, gameDifficulty as BrainStormDifficulty, shockLevel)
       startShaking()
       incrementFire()
     }
@@ -213,8 +222,10 @@ export default function Component({ params }: { params: { game: string } }) {
     return;
   }
 
+  console.log(flipperPort)
+
   return (
-    <div className="relative flex flex-col min-h-screen bg-white">
+    <div className="relative flex flex-col min-h-screen">
       <GameClouds />
       <CorrectOverlay correct={feedback === AnswerFeedback.CORRECT}
         className={feedback === AnswerFeedback.NONE ? "opacity-0" : "opacity-100"}
@@ -236,7 +247,7 @@ export default function Component({ params }: { params: { game: string } }) {
         </div>
         <div className="basis-1/2">
           {
-            flipperPort === null && (
+            !flipperPort && (
               <div className="flex justify-center items-center">
                 <Button className="flex items-center justify-center space-x-2 p-4"
                   onClick={connectToFlipper}
@@ -248,7 +259,7 @@ export default function Component({ params }: { params: { game: string } }) {
             )
           }
           {
-            flipperPort !== null && questionNumber < questions.length && (
+            flipperPort && questionNumber < questions.length && (
               <>
                 <Card className="rounded-xl shadow-lg">
                   <CardContent className="p-6 flex flex-col items-center text-center space-y-4">
@@ -268,7 +279,7 @@ export default function Component({ params }: { params: { game: string } }) {
           }
         </div>
         <div className="basis-1/4 flex flex-col items-center justify-center">
-          <Timer startTime={10} paused={false} />
+          <Timer startTime={10} paused={false} handleTimeout={handleTimeout} />
         </div>
       </main>
     </div>

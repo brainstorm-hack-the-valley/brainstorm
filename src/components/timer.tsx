@@ -4,9 +4,10 @@ import React, { useState, useEffect } from 'react';
 interface TimerProps {
   startTime: number; // Prop for starting time
   paused: boolean; // Prop for pausing the timer
+  handleTimeout: () => void; // Prop for handling timeout
 }
 
-const Timer: React.FC<TimerProps> = ({ startTime, paused }) => {
+const Timer: React.FC<TimerProps> = ({ startTime, paused, handleTimeout }) => {
   const [timeLeft, setTimeLeft] = useState(startTime); // Set the total time based on the prop
   const [pauseTime, setPauseTime] = useState(paused); // Set the pause time based on the prop
 
@@ -18,6 +19,7 @@ const Timer: React.FC<TimerProps> = ({ startTime, paused }) => {
       setTimeLeft((prevTime) => {
         if (prevTime <= 1) {
           clearInterval(interval); // Clear interval when time reaches 0
+          handleTimeout(); // Call the handleTimeout function
           return 0; // Set time left to 0
         }
         return prevTime - 1; // Decrease time left by 1 second
