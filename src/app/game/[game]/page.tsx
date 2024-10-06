@@ -70,7 +70,7 @@ export default function Component({ params }: { params: { game: string } }) {
   const [gameState, setGameState] = useState({
     question: 1
   })
-  const startTime = 30;
+  const [startTime, setStartTime] = useState(60)
   const [gameDifficulty, setGameDifficulty] = useState<BrainStormDifficulty>(PEACEFUL)
   const [questionNumber, setQuestionNumber] = useState(1)
   const [incorrectAnswers, setIncorrectAnswers] = useState(0)
@@ -98,6 +98,8 @@ export default function Component({ params }: { params: { game: string } }) {
       redirect("/")
     }
     setGameDifficulty(gameDifficulty)
+    setStartTime(gameDifficulty.getTimer())
+    setTimeLeft(gameDifficulty.getTimer())
 
     let topic = window.localStorage.getItem("subject")
     if (!topic) {
@@ -109,6 +111,9 @@ export default function Component({ params }: { params: { game: string } }) {
     if (fetched) {
       return
     }
+
+    generateShockValues()
+
     fetch(`/api/generate?topic=${topic}&difficulty=${gameDifficulty.getId()}`).then(response => {
       if (!response.ok) {
         console.log("Failed to fetch questions")
@@ -231,8 +236,10 @@ export default function Component({ params }: { params: { game: string } }) {
   let interval: NodeJS.Timeout;
 
   useEffect(() => {
-    // GenerateShockValues
-    generateShockValues()
+    if (loading) {
+        return;
+    }
+
     // Automatically start the timer when the component mounts
     interval = setInterval(() => {
       setTimeLeft((prevTime) => {
@@ -245,7 +252,7 @@ export default function Component({ params }: { params: { game: string } }) {
     }, 1000);
 
     return () => clearInterval(interval); // Cleanup interval on unmount
-  }, []);
+  }, [loading]);
 
   useEffect(() => {
     // Pause the timer when the pauseTime prop is true

@@ -43,7 +43,7 @@ export const A_RAINY_DAY = new BrainStormGamemode("a-rainy-day", "A Rainy Day", 
     [new Rule(TimerIcon, "No time pressure."), new Rule(XIcon, "Incorrect answers intensify the storm.")])
 
 export const A_STORMY_NIGHTMARE = new BrainStormGamemode("a-stormy-nightmare", "A Stormy Nightmare", "stormy_nightmare.png",
-    [new Rule(TimerIcon, "You have 5-10s to answer each question."), new Rule(CloudLightningIcon, "Running out of time might be shocking.")])
+    [new Rule(TimerIcon, "You have 1-2 minutes to answer all the questions."), new Rule(CloudLightningIcon, "Running out of time might be shocking.")])
 
 const ALL_GAMEMODES = [A_RAINY_DAY, A_STORMY_NIGHTMARE]
 
@@ -80,10 +80,10 @@ export class BrainStormDifficulty {
     }
 }
 
-export const PEACEFUL = new BrainStormDifficulty("peaceful", "Peaceful", 10, 0)
-export const EASY = new BrainStormDifficulty("easy", "Easy", 10, 10)
-export const MEDIUM = new BrainStormDifficulty("medium", "Medium", 7, 20)
-export const HARD = new BrainStormDifficulty("hard", "Hard", 5, 30)
+export const PEACEFUL = new BrainStormDifficulty("peaceful", "Peaceful", 120, 0)
+export const EASY = new BrainStormDifficulty("easy", "Easy", 90, 10)
+export const MEDIUM = new BrainStormDifficulty("medium", "Medium", 60, 20)
+export const HARD = new BrainStormDifficulty("hard", "Hard", 45, 30)
 
 const ALL_DIFFICULTIES = [PEACEFUL, EASY, MEDIUM, HARD]
 
