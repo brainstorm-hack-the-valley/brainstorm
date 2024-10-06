@@ -1,11 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { OpenAI } from 'openai';
+import * as Game from "@/game/game"
 
 export async function GET(request: NextRequest) {
   try {
     const query = request.nextUrl.searchParams;
     const topic = query.get('topic');
-    const difficulty = query.get('difficulty');
+    let difficulty = query.get('difficulty');
+    if (difficulty === Game.PEACEFUL.getId()) {
+      difficulty = " very easy";
+    }
+
+    if (difficulty === Game.MEDIUM.getId()) {
+      difficulty = "hard";
+    }
+
+    if (difficulty === Game.HARD.getId()) {
+      difficulty = "obscure and difficult";
+    }
 
     const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -15,7 +27,7 @@ export async function GET(request: NextRequest) {
         { role: "system", content: "You are an educational tutor." },
         {
           role: "user",
-          content: "Give me 10 " + difficulty + " question about topic " + topic + " with 4 options that are very close to the correct answer and the correct answer. Respond in an array of JSON objects in the form [{ \"question\": \"\", \"options\": [\"\", \"\", \"\", \"\"], \"answer\": \"\" }]. Please do not use any markup.",
+          content: "Give me 10 " + difficulty + " question about topic " + topic + " with 4 options that are very close to the correct answer and the correct answer. Respond in an array of JSON objects in the exact form [{ \"question\": \"\", \"options\": [\"\", \"\", \"\", \"\"], \"answer\": \"\" }]. Please do not use any markup or any other formatting text.",
         },
       ],
     });
