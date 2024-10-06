@@ -113,7 +113,7 @@ export default function Component({ params }: { params: { game: string } }) {
     }
 
     generateShockValues()
-
+    
     fetch(`/api/generate?topic=${topic}&difficulty=${gameDifficulty.getId()}`).then(response => {
       if (!response.ok) {
         console.log("Failed to fetch questions")
@@ -168,7 +168,6 @@ export default function Component({ params }: { params: { game: string } }) {
         setCorrectAnswers(nextCorrect)
         setCorrect(correct)
         setShowFeedback(true)
-        generateShockValues()
         if (!correct) {
             if (game == A_STORMY_NIGHTMARE) {
                 sendShock(flipperPort, game as BrainStormGamemode, gameDifficulty as BrainStormDifficulty, shockLevel)
@@ -176,7 +175,7 @@ export default function Component({ params }: { params: { game: string } }) {
             startShaking()
             incrementFire()
         } else {
-            setTimeLeft(timeLeft + 5)
+            setTimeLeft(timeLeft + 5 + Math.ceil(0.05*(startTime-timeLeft)))
         }
         setTimeout(() => {
             // if (questionNumber > nextQuestionNumber) {
@@ -185,6 +184,7 @@ export default function Component({ params }: { params: { game: string } }) {
             // }
             setQuestionNumber(nextQuestionNumber)
             setShowFeedback(false)
+            generateShockValues()
         }, 1000)
     }
 
