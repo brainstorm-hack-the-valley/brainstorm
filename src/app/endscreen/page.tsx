@@ -3,18 +3,10 @@ import React from "react";
 import { Trophy } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-interface EndScreenProps {
-    numShock: number;
-    numCorrect: number;
-}
+const EndScreen = () => {
+    const numShock = localStorage.getItem("numShock");
+    const numCorrect = localStorage.getItem("numCorrect");
 
-const EndScreen = ({ numShock, numCorrect }: EndScreenProps) => {
-    if (numShock === undefined) {
-        numShock = 0;
-    }
-    if (numCorrect === undefined) {
-        numCorrect = 0;
-    }
     const router = useRouter();
     return (
         <div className="min-h-screen flex flex-col items-center justify-center bg-white p-6">
