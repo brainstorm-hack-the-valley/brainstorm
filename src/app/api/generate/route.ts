@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
       difficulty = "obscure and difficult";
     }
 
-    if (true) {
+    if (false) {
       const questions = [
         { "question": "What is the capital of France?", "options": ["Paris", "London", "Berlin", "Madrid"], "answer": "Paris" },
         { "question": "What is the capital of the United States?", "options": ["Washington D.C.", "New York", "Los Angeles", "Chicago"], "answer": "Washington D.C." },
