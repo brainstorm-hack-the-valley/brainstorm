@@ -86,7 +86,7 @@ export default function Component({ params }: { params: { game: string } }) {
   const [correct, setCorrect] = useState(false)
   const [showFeedback, setShowFeedback] = useState(false)
   const [shockValues, setShockValues] = useState([0, 0, 0, 0])
-
+  const [gameFinishing , setGameFinishing] = useState(false)
 
   const [questions, setQuestions] = useState<BrainstormQuestion[]>([])
   const [loading, setLoading] = useState(true)
@@ -253,6 +253,10 @@ export default function Component({ params }: { params: { game: string } }) {
   }, [pauseTime]);
 
   function finishGame() {
+    if (gameFinishing) {
+      return
+    }
+    setGameFinishing(true)
     startShaking()
     sendShock(flipperPort, game as BrainStormGamemode, gameDifficulty as BrainStormDifficulty, 3)
 
@@ -273,15 +277,22 @@ export default function Component({ params }: { params: { game: string } }) {
             </div>
         )
     }
+    if (gameFinishing) {
+        return;
+    }
+
     if (questionNumber >= questions.length) {
+        console.log("Finishing game due to last question")
         finishGame()
         return;
     }
     if (game == A_RAINY_DAY && incorrectAnswers >= 3) {
+        console.log("Finishing game due to incorrect answers")
         finishGame()
         return;
     }
     if (game == A_STORMY_NIGHTMARE && timeLeft <= 0) {
+        console.log("Finishing game due to no time left")
         finishGame()
         return;
     }
