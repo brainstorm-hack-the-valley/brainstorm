@@ -1,11 +1,25 @@
 'use client';
-import React from "react";
+import React, { useEffect } from "react";
 import { Trophy } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 const EndScreen = () => {
-    const numShock = localStorage.getItem("numShock");
-    const numCorrect = localStorage.getItem("numCorrect");
+    const [numShock, setNumShock] = React.useState(0);
+    const [numCorrect, setNumCorrect] = React.useState(0);
+
+    useEffect(() => {
+        let newNumShocks = window.localStorage.getItem("numShock");
+        if (!newNumShocks) {
+            newNumShocks = "0"
+        }
+        let newNumCorrect = window.localStorage.getItem("numCorrect");
+        if (!newNumCorrect) {
+            newNumCorrect = "0"
+        }
+
+        setNumShock(parseInt(newNumShocks));
+        setNumCorrect(parseInt(newNumCorrect));
+    }, []);
 
     const router = useRouter();
     return (

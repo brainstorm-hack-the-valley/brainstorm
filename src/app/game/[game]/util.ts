@@ -5,7 +5,6 @@ export function sendShock(port: any, gamemode: BrainStormGamemode, difficulty: B
     let vibrate = true;
     let shockLevel = randShockLevel
 
-    // TODO: Remove this...
     if (difficulty.getId() !== PEACEFUL.getId()) {
         vibrate = false;
     }
@@ -29,6 +28,9 @@ export function sendShock(port: any, gamemode: BrainStormGamemode, difficulty: B
 
     const shockLevelFill = shockLevel.toString().padStart(2, '0');
 
-    const command = `subghz tx_from_file /ext/subghz/R1${vibrate ? 'V' : ''}${shockLevelFill}.sub 1 0`
+    let command = `subghz tx_from_file /ext/subghz/R1${vibrate ? 'V' : ''}${shockLevelFill}.sub 1 0`
+    if (vibrate) {
+        command = `subghz tx_from_file /ext/subghz/R1V.sub 1 0`
+    }
     sendFlipperCommand(port, command)
 }

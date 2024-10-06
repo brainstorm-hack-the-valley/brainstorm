@@ -42,10 +42,10 @@ export default function Page({ params }: { params: { mode: string } }) {
       </div>
       <Tabs className="mx-auto px-32 w-full" defaultValue={Game.EASY.getId()}>
         <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value={Game.PEACEFUL.getId()}>{Game.PEACEFUL.getName()}</TabsTrigger>
-          <TabsTrigger value={Game.EASY.getId()}>{Game.EASY.getName()}</TabsTrigger>
-          <TabsTrigger value={Game.MEDIUM.getId()}>{Game.MEDIUM.getName()}</TabsTrigger>
-          <TabsTrigger value={Game.HARD.getId()}>{Game.HARD.getName()}</TabsTrigger>
+          <TabsTrigger className="text-lg" value={Game.PEACEFUL.getId()}>{Game.PEACEFUL.getName()}</TabsTrigger>
+          <TabsTrigger className="text-lg" value={Game.EASY.getId()}>{Game.EASY.getName()}</TabsTrigger>
+          <TabsTrigger className="text-lg" value={Game.MEDIUM.getId()}>{Game.MEDIUM.getName()}</TabsTrigger>
+          <TabsTrigger className="text-lg" value={Game.HARD.getId()}>{Game.HARD.getName()}</TabsTrigger>
         </TabsList>
         {[Game.PEACEFUL, Game.EASY, Game.MEDIUM, Game.HARD].map((difficulty) => (
           <TabsContent value={difficulty.getId()} key={difficulty.getId()}>

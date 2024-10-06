@@ -4,13 +4,13 @@ import { Button } from "@/components/ui/button"
 import { useState, useEffect } from "react"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
-import { ArrowRight, CheckCircle, Smartphone, Zap, Shield, Brain, TriangleAlert, Router } from "lucide-react"
+import { ArrowRight, CheckCircle, Smartphone, Zap, Shield, Brain, TriangleAlert, Router, Cloud, CloudLightning, CloudLightningIcon, CloudRainIcon } from "lucide-react"
 import { LightningBoltIcon } from "@radix-ui/react-icons"
 import Link from "next/link"
 import GameClouds from "@/components/brainstorm/GameClouds"
 import Image from "next/image"
 import PirateShip from "@/assets/pirate_ship.png"
-import { BrainStormDifficulty, BrainStormGamemode, BrainstormQuestion, getDifficultyById, getGamemodeById, PEACEFUL } from "@/game/game"
+import { A_RAINY_DAY, A_STORMY_NIGHTMARE, BrainStormDifficulty, BrainStormGamemode, BrainstormQuestion, getDifficultyById, getGamemodeById, PEACEFUL } from "@/game/game"
 import { redirect } from "next/navigation"
 import Timer from "@/components/timer"
 import TimerLightning from "@/components/timerLightning"
@@ -26,6 +26,7 @@ import { sendShock } from "@/app/game/[game]/util"
 import CorrectOverlay from "@/components/brainstorm/CorrectOverlay"
 import { start } from "repl"
 import { useRouter } from "next/navigation"
+import { Question, QuestionCircle } from "@mynaui/icons-react"
 
 function AnswerButton(props: {
   answer: string,
@@ -79,6 +80,7 @@ export default function Component({ params }: { params: { game: string } }) {
   const [gameDifficulty, setGameDifficulty] = useState<BrainStormDifficulty>(PEACEFUL)
   const [questionNumber, setQuestionNumber] = useState(1)
   const [incorrectAnswers, setIncorrectAnswers] = useState(0)
+  const [correctAnswers, setCorrectAnswers] = useState(0)
   const [timeLeft, setTimeLeft] = useState(startTime); // Set the total time based on the prop
   const [pauseTime, setPauseTime] = useState(false); // Set the pause time based on the prop
   const [correct, setCorrect] = useState(false)
@@ -144,11 +146,6 @@ export default function Component({ params }: { params: { game: string } }) {
     readResponse()
   }, [flipperPort])
 
-  function handleTimeout() {
-    console.log("Timeout")
-    sendShock(flipperPort, game as BrainStormGamemode, gameDifficulty as BrainStormDifficulty, 3)
-  }
-
   const question = questions[questionNumber - 1] as BrainstormQuestion
 
     function handleAnswer(answer: string, shockLevel: number) {
@@ -157,15 +154,18 @@ export default function Component({ params }: { params: { game: string } }) {
         }
         console.log(`Answered ${answer} with shock level ${shockLevel}`)
         const correct = answer === question.answer
-        const nextQuestionNumber = (questionNumber % questions.length) + 1
+        const nextQuestionNumber = questionNumber + 1
         const nextIncorrect = incorrectAnswers + (correct ? 0 : 1)
+        const nextCorrect = correctAnswers + (correct ? 1 : 0)
         setIncorrectAnswers(nextIncorrect)
+        setCorrectAnswers(nextCorrect)
         setCorrect(correct)
         setShowFeedback(true)
         generateShockValues()
         if (!correct) {
-            sendShock(flipperPort, game as BrainStormGamemode, 
-                        gameDifficulty as BrainStormDifficulty, shockLevel)
+            if (game == A_STORMY_NIGHTMARE) {
+                sendShock(flipperPort, game as BrainStormGamemode, gameDifficulty as BrainStormDifficulty, shockLevel)
+            }
             startShaking()
             incrementFire()
         } else {
@@ -252,25 +252,63 @@ export default function Component({ params }: { params: { game: string } }) {
     }
   }, [pauseTime]);
 
+  function finishGame() {
+    startShaking()
+    sendShock(flipperPort, game as BrainStormGamemode, gameDifficulty as BrainStormDifficulty, 3)
+
+    setTimeout(() => {
+        const numShocks = game == A_STORMY_NIGHTMARE ? incorrectAnswers : 1;
+        localStorage.setItem("numShock", numShocks.toString());
+        localStorage.setItem("numCorrect", correctAnswers.toString());
+        router.push("/endscreen");
+    }, 1000)
+  }
+
     if (loading) {
-        return <div>Loading...</div>
+        return (
+            <div className="flex flex-col justify-center items-center h-screen gap-y-4">
+                <h1 className="text-2xl font-semibold">Loading Game...</h1>
+                <LightningBoltIcon className="w-36 h-36 text-black animate-spin" 
+                    style={{animation: "spin 2s linear infinite"}}/>
+            </div>
+        )
     }
     if (questionNumber >= questions.length) {
-        localStorage.setItem("numShock", incorrectAnswers.toString());
-        localStorage.setItem("numCorrect", (10 - incorrectAnswers).toString());
-        router.push("/endscreen");
+        finishGame()
+        return;
+    }
+    if (game == A_RAINY_DAY && incorrectAnswers >= 3) {
+        finishGame()
+        return;
+    }
+    if (game == A_STORMY_NIGHTMARE && timeLeft <= 0) {
+        finishGame()
         return;
     }
 
+    let cloudColor = 0xFFFFFF
+    if (game == A_STORMY_NIGHTMARE) {
+        cloudColor = 0x808080
+        cloudColor -= incorrectAnswers * 0x202020
+    } else {
+        cloudColor -= incorrectAnswers * 0x404040
+    }
+    cloudColor = Math.max(cloudColor, 0x000000)
     
     return (
         <div className="relative flex flex-col min-h-screen">
-            <GameClouds />
-            <header className="py-4 px-4 lg:px-6 h-14 grid grid-cols-3 text-3xl 
+            <GameClouds cloudColor={cloudColor}/>
+            <header className="py-4 h-14 grid grid-cols-4 text-3xl 
       font-bold tracking-tighter">
                 <span></span>
-                <h1 className="mx-auto text-red-300">{game.name}</h1>
-                <h1 className="mx-auto text-red-500 text-xl tracking-normal">{`Question ${questionNumber}/10`}</h1>
+                <Card className="w-fit p-4 col-span-2 flex justify-center items-center mx-auto gap-x-2">
+                    <CloudRainIcon className="h-8 w-8 text-blue-500" />
+                    <h1 className="w-fit text-black">{game.name}</h1>
+                </Card>
+                <Card className="w-fit p-4 flex justify-center items-center mx-auto gap-x-2">
+                    <QuestionCircle className="h-8 w-8 text-blue-500" />
+                    <h1 className="mx-auto text-black text-xl tracking-normal">{`Question ${questionNumber}/10`}</h1>
+                </Card>
             </header>
             <div className="absolute w-1/4 h-screen flex flex-col items-center">
                 {isLightning && (
@@ -327,7 +365,8 @@ export default function Component({ params }: { params: { game: string } }) {
                         ) 
                     }
                 </div>
-                {<TimerLightning startTime={startTime} remainingTime={timeLeft} paused={false} />}
+                {game == A_STORMY_NIGHTMARE && 
+                    <TimerLightning startTime={startTime} remainingTime={timeLeft} paused={false} />}
             </main>
         </div>
     )

@@ -20,20 +20,10 @@ export default function Home() {
     return (
         <div className="min-h-screen flex flex-col bg-white">
             <Header />
-            <div className="flex flex-col items-center justify-center mt-16">
-                <h1 className="text-4xl font-bold text-blue-700 mb-2">Welcome Back!</h1>
-
-                {/* Cloud with Text */}
-                <div className="relative flex items-center justify-center mb-4">
-                    {/* Cloud Icon */}
-                    <Cloud className="w-80 h-60 text-blue-100 fill-current" />
-
-                    {/* Text over Cloud */}
-                    <div className="absolute flex items-center justify-center w-full h-full">
-                        <p className="text-center text-lg text-blue-700 font-bold">
-                            Choose A Lesson Plan
-                        </p>
-                    </div>
+            <div className="flex flex-col items-center justify-center mt-16 gap-y-10">
+                <div className='flex gap-4 items-center'>
+                    <Cloud className="w-12 h-12 text-blue-100 fill-current" />
+                    <h1 className="text-4xl font-bold text-blue-700">Choose an Adventure!</h1>
                 </div>
 
                 {/* Cards */}
@@ -53,7 +43,7 @@ export default function Home() {
                         </div>
 
                         {/* Overlay for Hover Effect */}
-                        <div className="absolute inset-0 flex flex-col items-center justify-center transition-opacity duration-300 opacity-0 group-hover:opacity-100 z-10 bg-white cursor-pointer">
+                        <div className="absolute p-6 inset-0 flex flex-col items-center justify-center transition-opacity duration-300 opacity-0 group-hover:opacity-100 z-10 bg-white cursor-pointer">
                             <h3 className="text-xl font-semibold mb-2">A Rainy Day</h3>
                             <div className="flex items-center mb-2 justify-start w-full ml-2">
                                 <TimerOff className="w-12 h-12 text-green-500 mr-2" />
@@ -81,7 +71,7 @@ export default function Home() {
                         </div>
 
                         {/* Overlay for Hover Effect */}
-                        <div className="absolute inset-0 flex flex-col items-center justify-center transition-opacity duration-300 opacity-0 group-hover:opacity-100 z-10 bg-white cursor-pointer">
+                        <div className="absolute p-6 inset-0 flex flex-col items-center justify-center transition-opacity duration-300 opacity-0 group-hover:opacity-100 z-10 bg-white cursor-pointer">
                             <h3 className="text-xl font-semibold mb-2">A Stormy Nightmare</h3>
                             <div className="flex items-center mb-2 justify-start w-full ml-2">
                                 <Timer className="w-12 h-12 text-yellow-500 mr-2" />

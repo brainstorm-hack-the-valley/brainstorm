@@ -19,7 +19,7 @@ declare global {
   }
 }
 
-export default memo(function GameClouds() {
+export default memo(function GameClouds({ cloudColor } : { cloudColor: number }) {
   // const { className, ...rest } = props
   return (
     <Canvas camera={{ position: [0, 8, 10], fov: 55, near: 1, far: 20000}} 
@@ -29,7 +29,7 @@ export default memo(function GameClouds() {
       gl={{ toneMapping: THREE.NoToneMapping }}
     >
       {/* <StatsGl /> */}
-      <Sky />
+      <Sky cloudColor={cloudColor} />
       <Ocean />
       <ambientLight intensity={5} />
       {/* <spotLight position={[0, 40, 0]} decay={0} distance={45} penumbra={1} intensity={100} /> */}
@@ -64,7 +64,7 @@ function Ocean() {
   return <water ref={ref} args={[geom, config]} rotation-x={-Math.PI / 2} />
 }
 
-function Sky() {
+function Sky({ cloudColor } : { cloudColor: number }) {
   const ref = useRef<THREE.Group<THREE.Object3DEventMap>>(null)
   // const cloud0 = useRef()
   // const { color, x, y, z, range, ...config } = useControls({
@@ -105,7 +105,7 @@ function Sky() {
   })
   return (
     <>
-      <SkyImpl />
+      <SkyImpl/>
       <group ref={ref}>
         <Clouds material={THREE.MeshLambertMaterial} limit={400} range={range}>
           {/* <Cloud ref={cloud0} {...config} bounds={[x, y, z]} color={color} /> */}
@@ -113,7 +113,7 @@ function Sky() {
           <Cloud {...config} bounds={[x, y, z]} color="#404040" seed={3} position={[-15, 0, 0]} />
           <Cloud {...config} bounds={[x, y, z]} color="#404040" seed={4} position={[0, 0, -12]} />
           <Cloud {...config} bounds={[x, y, z]} color="#404040" seed={5} position={[0, 0, 12]} /> */}
-          <Cloud concentrate="outside" growth={100} color="#ffffff" opacity={1.25} 
+          <Cloud concentrate="outside" growth={100} color={cloudColor} opacity={1.25} 
                  seed={0.3} bounds={200} volume={200} speed={speed} fade={0} />
         </Clouds>
       </group>

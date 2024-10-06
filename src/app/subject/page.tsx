@@ -26,7 +26,7 @@ export default function Subject() {
             </div>
             <div className="relative flex flex-col items-center justify-center mt-16">
                 {/* Cards */}
-                <div className="flex flex-col md:flex-row gap-6 rounded-lg shadow-md bg-blue-100 p-5">
+                <div className="flex flex-row gap-6 rounded-lg shadow-md bg-blue-100 p-5">
                     {/* First Card with Rain Icon and Ship */}
                     <div className="relative group bg-white shadow-md rounded-lg p-6 w-80 overflow-hidden"
                         onClick={() => handleClick("Discrete Math")}>
@@ -73,7 +73,7 @@ export default function Subject() {
                         </div>
                     </div>
                 </div>
-                <div className="flex flex-col md:flex-row gap-6 rounded-lg shadow-md bg-blue-100 p-5">
+                <div className="flex flex-row gap-6 rounded-lg shadow-md bg-blue-100 p-5">
                     {/* First Card with Rain Icon and Ship */}
                     <div className="relative group bg-white shadow-md rounded-lg p-6 w-80 overflow-hidden"
                         onClick={() => handleClick("General Knowledge")}>
